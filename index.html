@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Propensity Clock</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, serif;
+            background: #0a0a0a;
+            color: #c8d5b9;
+            min-height: 100vh;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            opacity: 0;
+            transition: opacity 3s ease-in;
+            position: relative;
+        }
+
+        .container.visible {
+            opacity: 1;
+        }
+
+        body.intro-active {
+            overflow: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            color: #9db88b;
+            margin-bottom: 15px;
+            font-weight: normal;
+        }
+
+        .subtitle {
+            font-style: italic;
+            font-size: 1rem;
+            color: #6a7a5c;
+            margin-bottom: 40px;
+        }
+
+        .explanation-box {
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 30px;
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            border-left: 4px solid #9db88b;
+        }
+
+        .explanation-box h3 {
+            color: #9db88b;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            font-weight: normal;
+            text-transform: uppercase;
+        }
+
+        .explanation-box p {
+            color: #c8d5b9;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .explanation-box strong {
+            color: #9db88b;
+        }
+
+        .instructions {
+            font-size: 1.2rem;
+            color: #9db88b;
+            margin: 30px 0 20px;
+            letter-spacing: 2px;
+        }
+
+        .age-display {
+            font-size: 5rem;
+            color: #9db88b;
+            margin-bottom: 20px;
+            letter-spacing: 8px;
+            font-weight: normal;
+            text-shadow: 0 0 30px rgba(157, 184, 139, 0.4);
+        }
+
+        .slider-container {
+            max-width: 700px;
+            margin: 0 auto 40px;
+            padding: 20px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 12px;
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            background: #9db88b;
+            border: 3px solid #c8d5b9;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(157, 184, 139, 0.6);
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 25px rgba(157, 184, 139, 0.9);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 30px;
+            height: 30px;
+            background: #9db88b;
+            border: 3px solid #c8d5b9;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(157, 184, 139, 0.6);
+            transition: all 0.2s;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #6a7a5c;
+            letter-spacing: 1px;
+        }
+
+        /* PEAK BADGES */
+        .progress-section {
+            margin: 40px auto;
+            padding: 30px;
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            text-align: center;
+            max-width: 100%;
+        }
+
+        .progress-title {
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            color: #9db88b;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .peaks-discovered {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .peak-badge {
+            padding: 10px 20px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #6a7a5c;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .peak-badge.discovered {
+            background: #9db88b;
+            color: #0a0a0a;
+            border-color: #9db88b;
+            box-shadow: 0 0 15px rgba(157, 184, 139, 0.5);
+            font-weight: bold;
+        }
+
+
+        /* TIMELINE */
+        .timeline-section {
+            margin: 60px auto;
+            padding: 30px;
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            max-width: 100%;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.3rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #9db88b;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #6a7a5c;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .timeline-canvas {
+            width: 100%;
+            height: 250px;
+            cursor: pointer;
+        }
+
+        .timeline-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding: 15px;
+            background: #0a0a0a;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #c8d5b9;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        /* DIALS */
+        .dials-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin: 60px auto;
+            max-width: 100%;
+        }
+
+        .dial-card {
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .dial-card:hover {
+            border-color: #4a4a4a;
+            transform: translateY(-3px);
+        }
+
+        .dial-card.highest {
+            border-color: #9db88b;
+            box-shadow: 0 0 20px rgba(157, 184, 139, 0.3);
+        }
+
+        .dial-title {
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            color: #9db88b;
+            font-weight: normal;
+        }
+
+        .dial-svg {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 20px;
+        }
+
+        .dial-value {
+            display: none;
+        }
+
+        .dial-meaning {
+            font-size: 0.85rem;
+            color: #8a9a7c;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .dial-card::after {
+            content: 'Click for details';
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #6a7a5c;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .dial-card:hover::after {
+            opacity: 1;
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #0f0f0f;
+            border: 2px solid #4a4a4a;
+            padding: 40px;
+            max-width: 700px;
+            width: 90%;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #c8d5b9;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .modal-text {
+            color: #c8d5b9;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .modal-insight {
+            font-style: italic;
+            padding: 20px;
+            background: #0a0a0a;
+            margin-top: 20px;
+        }
+
+        .modal-chart-container {
+            height: 250px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        /* INTRO SEQUENCE */
+        .intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0a0a0a;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 2.5s ease-out;
+            overflow: hidden;
+        }
+
+        .intro-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #introCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+                letter-spacing: 4px;
+            }
+
+            .age-display {
+                font-size: 3.5rem;
+            }
+
+            .dials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dial-svg {
+                width: 140px;
+                height: 140px;
+            }
+
+            .timeline-canvas {
+                height: 200px;
+            }
+
+            .explanation-box {
+                padding: 20px;
+                margin: 30px auto;
+            }
+
+            .dials-grid {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- INTRO OVERLAY -->
+    <div class="intro-overlay" id="introOverlay">
+        <canvas id="introCanvas"></canvas>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>The Propensity Clock</h1>
+            <p class="subtitle">After A. Quetelet's <em>Treatise on Man</em> (1835)</p>
+
+            <div class="explanation-box">
+                <h3>What You're About to See</h3>
+                <p>In 1835, Belgian statistician Adolphe Quetelet analyzed thousands of people and discovered something disturbing: <strong>your age predicts your behavior</strong>.</p>
+                <p>He measured six key "propensities" across different ages—crime, marriage, madness, strength, creativity, and death. Each one follows a predictable curve.</p>
+                <p><strong>His radical claim:</strong> These patterns prove we have less free will than we think. Society and age determine who we are, not our choices.</p>
+                <p>Below, you'll drag a slider through the ages of life. Watch how all six propensities shift as you age. Is Quetelet right? Are we just predictable clockwork?</p>
+            </div>
+
+            <p class="instructions">Drag the slider to explore how your age shapes your statistical destiny</p>
+
+            <div class="age-display" id="ageDisplay">25</div>
+
+            <div class="slider-container">
+                <input type="range" id="ageSlider" min="1" max="80" value="1" step="1">
+                <div class="slider-labels">
+                    <span>Birth</span>
+                    <span>Youth</span>
+                    <span>Prime</span>
+                    <span>Mature</span>
+                    <span>Elder</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- PEAK AGES -->
+        <div class="progress-section">
+            <div class="progress-title">Peak Ages Reference</div>
+            <p style="color: #8a9a7c; margin-bottom: 20px;">These are the ages when each propensity reaches its maximum</p>
+            <div class="peaks-discovered">
+                <div class="peak-badge discovered">Crime: 25</div>
+                <div class="peak-badge discovered">Marriage: 28</div>
+                <div class="peak-badge discovered">Madness: 35</div>
+                <div class="peak-badge discovered">Strength: 25</div>
+                <div class="peak-badge discovered">Creativity: 35</div>
+                <div class="peak-badge discovered">Safest: 10</div>
+            </div>
+        </div>
+
+        <!-- TIMELINE -->
+        <div class="timeline-section">
+            <h2 class="section-title">Your Life Trajectory</h2>
+            <p class="section-subtitle">This graph shows all six propensities across your entire lifetime. The vertical line is your current age. Click any age to jump there.</p>
+            <canvas id="timelineCanvas" class="timeline-canvas"></canvas>
+            <div class="timeline-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #e74c3c;"></div>
+                    <span>Crime</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #3498db;"></div>
+                    <span>Marriage</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #9b59b6;"></div>
+                    <span>Madness</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f39c12;"></div>
+                    <span>Strength</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #1abc9c;"></div>
+                    <span>Creativity</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #95a5a6;"></div>
+                    <span>Death</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="explanation-box" style="margin-bottom: 30px;">
+            <h3>The Six Dials</h3>
+            <p>Each dial below shows one propensity on a scale of 0-100. As you drag the slider, watch them all change together. The glowing dial is your highest propensity at this age.</p>
+            <p><strong>Click any dial</strong> to see its full life curve and learn what Quetelet discovered about it.</p>
+        </div>
+
+        <!-- DIALS -->
+        <div class="dials-grid">
+            <div class="dial-card" data-metric="crime">
+                <div class="dial-title">Crime</div>
+                <svg class="dial-svg" id="dial1"></svg>
+                <div class="dial-value" id="value1">—</div>
+                <div class="dial-meaning">Your likelihood of committing a crime (peaks at 25)</div>
+            </div>
+
+            <div class="dial-card" data-metric="marriage">
+                <div class="dial-title">Marriage</div>
+                <svg class="dial-svg" id="dial2"></svg>
+                <div class="dial-value" id="value2">—</div>
+                <div class="dial-meaning">Your marriageability and fertility (peaks at 28)</div>
+            </div>
+
+            <div class="dial-card" data-metric="alienation">
+                <div class="dial-title">Madness</div>
+                <svg class="dial-svg" id="dial3"></svg>
+                <div class="dial-value" id="value3">—</div>
+                <div class="dial-meaning">Risk of mental illness (peaks at 35)</div>
+            </div>
+
+            <div class="dial-card" data-metric="strength">
+                <div class="dial-title">Strength</div>
+                <svg class="dial-svg" id="dial4"></svg>
+                <div class="dial-value" id="value4">—</div>
+                <div class="dial-meaning">Physical power and vitality (peaks at 25)</div>
+            </div>
+
+            <div class="dial-card" data-metric="creative">
+                <div class="dial-title">Creativity</div>
+                <svg class="dial-svg" id="dial5"></svg>
+                <div class="dial-value" id="value5">—</div>
+                <div class="dial-meaning">Artistic and intellectual output (peaks at 35)</div>
+            </div>
+
+            <div class="dial-card" data-metric="mortality">
+                <div class="dial-title">Death</div>
+                <svg class="dial-svg" id="dial6"></svg>
+                <div class="dial-value" id="value6">—</div>
+                <div class="dial-meaning">Your mortality risk (lowest at 10, rises after 40)</div>
+            </div>
+        </div>
+
+
+        <!-- MODAL -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeModal()">×</button>
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <p class="modal-text" id="modalDescription"></p>
+                <div class="modal-chart-container">
+                    <canvas id="modalChart"></canvas>
+                </div>
+                <div class="modal-insight" id="modalInsight"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script>
+        // DATA (needed for intro)
+        const data = {
+            crime: [
+                {age: 16, value: 14}, {age: 17, value: 23}, {age: 18, value: 35},
+                {age: 19, value: 51}, {age: 20, value: 63}, {age: 21, value: 74},
+                {age: 22, value: 82}, {age: 23, value: 90}, {age: 24, value: 96},
+                {age: 25, value: 100}, {age: 26, value: 97}, {age: 27, value: 93},
+                {age: 28, value: 88}, {age: 29, value: 82}, {age: 30, value: 75},
+                {age: 35, value: 55}, {age: 40, value: 41}, {age: 45, value: 31},
+                {age: 50, value: 23}, {age: 55, value: 16}, {age: 60, value: 9},
+                {age: 70, value: 5}, {age: 80, value: 2}
+            ],
+            marriage: [
+                {age: 15, value: 10}, {age: 18, value: 35}, {age: 20, value: 55},
+                {age: 22, value: 75}, {age: 25, value: 90}, {age: 28, value: 100},
+                {age: 30, value: 95}, {age: 35, value: 70}, {age: 40, value: 45},
+                {age: 45, value: 25}, {age: 50, value: 12}, {age: 60, value: 5},
+                {age: 70, value: 2}
+            ],
+            alienation: [
+                {age: 10, value: 5}, {age: 15, value: 10}, {age: 20, value: 25},
+                {age: 25, value: 50}, {age: 30, value: 85}, {age: 35, value: 100},
+                {age: 40, value: 95}, {age: 45, value: 75}, {age: 50, value: 55},
+                {age: 60, value: 35}, {age: 70, value: 20}, {age: 80, value: 15}
+            ],
+            strength: [
+                {age: 10, value: 18}, {age: 15, value: 42}, {age: 18, value: 65},
+                {age: 20, value: 80}, {age: 25, value: 100}, {age: 30, value: 98},
+                {age: 35, value: 90}, {age: 40, value: 80}, {age: 45, value: 68},
+                {age: 50, value: 55}, {age: 55, value: 43}, {age: 60, value: 31},
+                {age: 70, value: 18}, {age: 80, value: 10}
+            ],
+            creative: [
+                {age: 18, value: 20}, {age: 22, value: 45}, {age: 25, value: 70},
+                {age: 28, value: 90}, {age: 30, value: 95}, {age: 33, value: 100},
+                {age: 35, value: 100}, {age: 38, value: 95}, {age: 40, value: 85},
+                {age: 45, value: 70}, {age: 50, value: 50}, {age: 60, value: 30},
+                {age: 70, value: 15}
+            ],
+            mortality: [
+                {age: 0, value: 100}, {age: 1, value: 80}, {age: 5, value: 35},
+                {age: 10, value: 10}, {age: 15, value: 12}, {age: 20, value: 15},
+                {age: 25, value: 18}, {age: 30, value: 20}, {age: 35, value: 25},
+                {age: 40, value: 32}, {age: 45, value: 42}, {age: 50, value: 55},
+                {age: 55, value: 68}, {age: 60, value: 80}, {age: 65, value: 88},
+                {age: 70, value: 93}, {age: 75, value: 97}, {age: 80, value: 100}
+            ]
+        };
+
+        // INTERPOLATION (needed for intro)
+        function interpolate(dataset, age) {
+            if (age < dataset[0].age) return dataset[0].value;
+            if (age > dataset[dataset.length - 1].age) return dataset[dataset.length - 1].value;
+
+            for (let i = 0; i < dataset.length - 1; i++) {
+                if (age >= dataset[i].age && age <= dataset[i + 1].age) {
+                    const t = (age - dataset[i].age) / (dataset[i + 1].age - dataset[i].age);
+                    return dataset[i].value + t * (dataset[i + 1].value - dataset[i].value);
+                }
+            }
+            return 0;
+        }
+
+        // INTRO SEQUENCE
+        let introComplete = false;
+        let introAnimationId = null;
+
+        function skipIntro() {
+            if (introComplete) return;
+            introComplete = true;
+
+            if (introAnimationId) {
+                cancelAnimationFrame(introAnimationId);
+                introAnimationId = null;
+            }
+
+            const overlay = document.getElementById('introOverlay');
+            const container = document.querySelector('.container');
+
+            // Remove scroll lock
+            document.body.classList.remove('intro-active');
+
+            // Start both transitions simultaneously for smooth crossfade
+            overlay.classList.add('fade-out');
+
+            // Delay container fade-in slightly for smoother transition
+            setTimeout(() => {
+                container.classList.add('visible');
+            }, 300);
+
+            // Initialize the app after a short delay
+            setTimeout(() => {
+                if (!radarChart) {
+                    updateAge(25);
+                }
+            }, 800);
+
+            // Remove overlay from DOM after fade completes
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 3000);
+        }
+
+        function finishIntro() {
+            if (introComplete) return;
+            skipIntro();
+        }
+
+        function playIntro() {
+            const canvas = document.getElementById('introCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Set canvas size
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let time = 0;
+            const totalDuration = 14000; // 14 seconds
+
+            // Generate people positions
+            const people = [];
+            const gridSize = 40;
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    people.push({
+                        gridX: (i - gridSize/2) * 60,
+                        gridY: (j - gridSize/2) * 60,
+                        age: Math.floor(Math.random() * 80) + 1,
+                        color: null
+                    });
+                }
+            }
+
+            // Assign colors based on age
+            people.forEach(person => {
+                if (person.age < 20) person.color = '#3498db'; // Blue - young
+                else if (person.age < 30) person.color = '#e74c3c'; // Red - crime peak
+                else if (person.age < 40) person.color = '#9b59b6'; // Purple - madness peak
+                else if (person.age < 50) person.color = '#f39c12'; // Orange - middle age
+                else person.color = '#95a5a6'; // Gray - elderly
+            });
+
+            function drawPerson(x, y, size, color) {
+                // Simple person silhouette
+                ctx.fillStyle = color;
+                // Head
+                ctx.beginPath();
+                ctx.arc(x, y - size * 0.6, size * 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                // Body
+                ctx.beginPath();
+                ctx.moveTo(x, y - size * 0.3);
+                ctx.lineTo(x, y + size * 0.3);
+                ctx.lineTo(x - size * 0.3, y + size * 0.8);
+                ctx.lineTo(x - size * 0.2, y + size * 0.8);
+                ctx.lineTo(x - size * 0.1, y + size * 0.3);
+                ctx.lineTo(x + size * 0.1, y + size * 0.3);
+                ctx.lineTo(x + size * 0.2, y + size * 0.8);
+                ctx.lineTo(x + size * 0.3, y + size * 0.8);
+                ctx.closePath();
+                ctx.fill();
+                // Arms
+                ctx.beginPath();
+                ctx.moveTo(x, y - size * 0.2);
+                ctx.lineTo(x - size * 0.5, y + size * 0.1);
+                ctx.lineTo(x - size * 0.4, y + size * 0.2);
+                ctx.lineTo(x, y - size * 0.1);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(x, y - size * 0.2);
+                ctx.lineTo(x + size * 0.5, y + size * 0.1);
+                ctx.lineTo(x + size * 0.4, y + size * 0.2);
+                ctx.lineTo(x, y - size * 0.1);
+                ctx.fill();
+            }
+
+            function animate() {
+                if (introComplete) return;
+
+                time += 16; // ~60fps
+                const progress = Math.min(time / totalDuration, 1);
+
+                // Get current dimensions in case of resize
+                const width = canvas.width;
+                const height = canvas.height;
+
+                ctx.fillStyle = '#0a0a0a';
+                ctx.fillRect(0, 0, width, height);
+
+                const centerX = width / 2;
+                const centerY = height / 2;
+
+                // Phase 1: Single person (0-2s)
+                if (progress < 0.14) {
+                    const scale = 1;
+                    drawPerson(centerX, centerY, 80 * scale, '#9db88b');
+                }
+                // Phase 2: Zoom out - reveal crowd (2-5s)
+                else if (progress < 0.36) {
+                    const phaseProgress = (progress - 0.14) / 0.22;
+                    const zoom = 1 - phaseProgress * 0.95; // Zoom out from 1 to 0.05
+                    const personSize = 80 * zoom;
+
+                    people.forEach(person => {
+                        const x = centerX + person.gridX * (1 - zoom);
+                        const y = centerY + person.gridY * (1 - zoom);
+
+                        if (x > -100 && x < width + 100 && y > -100 && y < height + 100) {
+                            drawPerson(x, y, Math.max(personSize, 3), '#9db88b');
+                        }
+                    });
+                }
+                // Phase 3: Transform to dots (5-7s)
+                else if (progress < 0.50) {
+                    const phaseProgress = (progress - 0.36) / 0.14;
+
+                    people.forEach(person => {
+                        const x = centerX + person.gridX * 0.05;
+                        const y = centerY + person.gridY * 0.05;
+
+                        if (x > -50 && x < width + 50 && y > -50 && y < height + 50) {
+                            // Morph from person to dot
+                            const dotSize = 3 + (1 - phaseProgress) * 2;
+                            const color = phaseProgress > 0.5 ? person.color : '#9db88b';
+
+                            if (phaseProgress < 0.7) {
+                                drawPerson(x, y, 3 * (1 - phaseProgress / 0.7), color);
+                            } else {
+                                ctx.fillStyle = color;
+                                ctx.beginPath();
+                                ctx.arc(x, y, dotSize, 0, Math.PI * 2);
+                                ctx.fill();
+                            }
+                        }
+                    });
+                }
+                // Phase 4: Split into 6 metrics (7-8.5s)
+                else if (progress < 0.61) {
+                    const phaseProgress = (progress - 0.50) / 0.11;
+
+                    // Assign each person to a metric group
+                    const metricsColors = {
+                        crime: '#e74c3c',
+                        marriage: '#3498db',
+                        alienation: '#9b59b6',
+                        strength: '#f39c12',
+                        creative: '#1abc9c',
+                        mortality: '#95a5a6'
+                    };
+
+                    people.forEach((person, i) => {
+                        const currentX = centerX + person.gridX * 0.05;
+                        const currentY = centerY + person.gridY * 0.05;
+
+                        // Assign to one of 6 groups
+                        const metricIndex = i % 6;
+                        const metricNames = ['crime', 'marriage', 'alienation', 'strength', 'creative', 'mortality'];
+                        const metric = metricNames[metricIndex];
+
+                        // Target positions: 6 vertical columns
+                        const targetX = centerX - 500 + metricIndex * 200;
+                        const targetY = centerY + (Math.random() - 0.5) * 400;
+
+                        const x = currentX + (targetX - currentX) * phaseProgress;
+                        const y = currentY + (targetY - currentY) * phaseProgress;
+
+                        ctx.fillStyle = metricsColors[metric];
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+
+                    // Show metric labels
+                    if (phaseProgress > 0.6) {
+                        ctx.fillStyle = '#666';
+                        ctx.font = '12px Georgia';
+                        ctx.textAlign = 'center';
+                        ctx.globalAlpha = (phaseProgress - 0.6) / 0.4;
+                        const labels = ['Crime', 'Marriage', 'Madness', 'Strength', 'Creativity', 'Death'];
+                        labels.forEach((label, i) => {
+                            const x = centerX - 500 + i * 200;
+                            ctx.fillText(label, x, centerY - 250);
+                        });
+                        ctx.globalAlpha = 1;
+                    }
+                }
+                // Phase 5: Form propensity curves (8.5-14s)
+                else {
+                    const phaseProgress = (progress - 0.61) / 0.39;
+
+                    const metricsColors = {
+                        crime: '#e74c3c',
+                        marriage: '#3498db',
+                        alienation: '#9b59b6',
+                        strength: '#f39c12',
+                        creative: '#1abc9c',
+                        mortality: '#95a5a6'
+                    };
+
+                    people.forEach((person, i) => {
+                        const metricIndex = i % 6;
+                        const metricNames = ['crime', 'marriage', 'alienation', 'strength', 'creative', 'mortality'];
+                        const metric = metricNames[metricIndex];
+
+                        const baseX = centerX - 500 + metricIndex * 200;
+
+                        // Get actual propensity value for this person's age
+                        const value = interpolate(data[metric], person.age);
+
+                        // Target Y based on propensity value
+                        const targetY = centerY + 200 - (value / 100) * 400;
+                        const currentY = centerY + (Math.random() - 0.5) * 400;
+
+                        // X position spread by age
+                        const ageSpread = (person.age / 80) * 160 - 80;
+                        const x = baseX + ageSpread * phaseProgress;
+                        const y = currentY + (targetY - currentY) * phaseProgress;
+
+                        ctx.fillStyle = metricsColors[metric];
+                        ctx.globalAlpha = 0.6;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.globalAlpha = 1;
+                    });
+
+                    // Draw curves over the dots
+                    if (phaseProgress > 0.4) {
+                        const metricsColors = {
+                            crime: '#e74c3c',
+                            marriage: '#3498db',
+                            alienation: '#9b59b6',
+                            strength: '#f39c12',
+                            creative: '#1abc9c',
+                            mortality: '#95a5a6'
+                        };
+                        const metricNames = ['crime', 'marriage', 'alienation', 'strength', 'creative', 'mortality'];
+
+                        ctx.lineWidth = 3;
+                        ctx.globalAlpha = (phaseProgress - 0.4) / 0.6;
+
+                        metricNames.forEach((metric, metricIndex) => {
+                            ctx.strokeStyle = metricsColors[metric];
+                            ctx.beginPath();
+
+                            for (let age = 1; age <= 80; age++) {
+                                const value = interpolate(data[metric], age);
+                                const baseX = centerX - 500 + metricIndex * 200;
+                                const ageSpread = (age / 80) * 160 - 80;
+                                const x = baseX + ageSpread;
+                                const y = centerY + 200 - (value / 100) * 400;
+
+                                if (age === 1) ctx.moveTo(x, y);
+                                else ctx.lineTo(x, y);
+                            }
+                            ctx.stroke();
+                        });
+
+                        ctx.globalAlpha = 1;
+                    }
+
+                    // Show metric labels
+                    ctx.fillStyle = '#9db88b';
+                    ctx.font = '14px Georgia';
+                    ctx.textAlign = 'center';
+                    const labels = ['Crime', 'Marriage', 'Madness', 'Strength', 'Creativity', 'Death'];
+                    labels.forEach((label, i) => {
+                        const x = centerX - 500 + i * 200;
+                        ctx.fillText(label, x, centerY - 250);
+                    });
+
+                    // Show axis labels
+                    if (phaseProgress > 0.7) {
+                        ctx.globalAlpha = (phaseProgress - 0.7) / 0.3;
+                        ctx.fillStyle = '#666';
+                        ctx.font = '12px Georgia';
+                        ctx.textAlign = 'right';
+                        ctx.fillText('100', centerX - 600, centerY - 180);
+                        ctx.fillText('0', centerX - 600, centerY + 200);
+                        ctx.textAlign = 'left';
+                        ctx.fillText('Age', centerX + 600, centerY + 220);
+                        ctx.globalAlpha = 1;
+                    }
+                }
+
+                if (progress < 1 && !introComplete) {
+                    introAnimationId = requestAnimationFrame(animate);
+                } else if (!introComplete) {
+                    // Pause briefly at the end before transition
+                    setTimeout(() => {
+                        finishIntro();
+                    }, 1000);
+                }
+            }
+
+            animate();
+        }
+
+        // Start intro on load
+        window.addEventListener('load', () => {
+            // Lock scrolling during intro
+            document.body.classList.add('intro-active');
+
+            // Small delay to ensure everything is loaded
+            setTimeout(() => {
+                playIntro();
+            }, 100);
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('introCanvas');
+            if (canvas && !introComplete && canvas.style.display !== 'none') {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            // Redraw timeline if main app is visible
+            if (introComplete) {
+                drawTimeline();
+            }
+        });
+
+        // COLORS
+        const colors = {
+            crime: '#e74c3c',      // Red
+            marriage: '#3498db',   // Blue
+            alienation: '#9b59b6', // Purple
+            strength: '#f39c12',   // Orange
+            creative: '#1abc9c',   // Teal
+            mortality: '#95a5a6'   // Gray
+        };
+
+        const dialDetails = {
+            crime: {
+                title: "Criminal Propensity",
+                description: "Quetelet analyzed thousands of court records and found that crime peaks sharply at age 25. Young men in their early twenties commit the most violent crimes. By age 40, criminal behavior drops to a fraction of its peak.",
+                insight: "Why 25? Quetelet argued it's when physical strength meets lack of social responsibility. You're strong enough to do damage, but not yet invested in society."
+            },
+            marriage: {
+                title: "Marriage & Fertility",
+                description: "Based on birth records and marriage registries, Quetelet found that marriageability and reproductive capacity peak around age 28. After 30, both decline steadily.",
+                insight: "In 1835, this was purely biological. Today, we might ask: how much of this is nature vs. social convention?"
+            },
+            alienation: {
+                title: "Mental Illness",
+                description: "Drawing from asylum admission data, Quetelet discovered that mental illness peaks between ages 30-40. The pressures of adult responsibilities, combined with declining physical vitality, create maximum psychological strain.",
+                insight: "The 'midlife crisis' isn't new—Quetelet documented it statistically 200 years ago."
+            },
+            strength: {
+                title: "Physical Strength",
+                description: "Using dynamometer measurements, Quetelet measured grip strength across ages. Peak physical power occurs at 25, then gradually declines. By 50, you've lost nearly half your maximum strength.",
+                insight: "Your body peaks early and decays slowly. Quetelet saw this as proof that humans are biological machines, subject to the same laws as any mechanical system."
+            },
+            creative: {
+                title: "Creative Output",
+                description: "By analyzing the ages at which playwrights wrote their best tragedies and poets published their masterworks, Quetelet found that creative output peaks around age 33-35—later than physical strength, but still finite.",
+                insight: "Genius isn't timeless. It has a statistical peak. Most great works are created in a narrow window of life."
+            },
+            mortality: {
+                title: "Mortality Risk",
+                description: "Quetelet's mortality data shows a U-shaped curve: high risk at birth, lowest around age 10, then rising exponentially after 40. By 80, you're as vulnerable as an infant.",
+                insight: "Age 10 is statistically the safest time to be alive. After that, the clock starts ticking faster."
+            }
+        };
+
+        let currentAge = 25;
+        let modalChart = null;
+        let radarChart = null;
+
+        // DRAW DIAL
+        function drawDial(svgId, targetValue, color) {
+            const svg = document.getElementById(svgId);
+            const size = 180;
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const radius = 70;
+            const strokeWidth = 16;
+
+            if (!svg.hasAttribute('data-current-value')) {
+                svg.setAttribute('data-current-value', 0);
+            }
+
+            const currentValue = parseFloat(svg.getAttribute('data-current-value'));
+            const duration = 400;
+            const startTime = performance.now();
+            const startValue = currentValue;
+
+            function animate(time) {
+                const elapsed = time - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                const value = startValue + (targetValue - startValue) * easeProgress;
+                svg.setAttribute('data-current-value', value);
+
+                svg.innerHTML = '';
+                svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
+
+                // Background
+                const bgArc = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                bgArc.setAttribute('cx', centerX);
+                bgArc.setAttribute('cy', centerY);
+                bgArc.setAttribute('r', radius);
+                bgArc.setAttribute('fill', 'none');
+                bgArc.setAttribute('stroke', '#1a1a1a');
+                bgArc.setAttribute('stroke-width', strokeWidth);
+                svg.appendChild(bgArc);
+
+                // Value arc
+                const startAngle = -135;
+                const endAngle = startAngle + (value / 100) * 270;
+                const startRad = (startAngle * Math.PI) / 180;
+                const endRad = (endAngle * Math.PI) / 180;
+
+                const x1 = centerX + radius * Math.cos(startRad);
+                const y1 = centerY + radius * Math.sin(startRad);
+                const x2 = centerX + radius * Math.cos(endRad);
+                const y2 = centerY + radius * Math.sin(endRad);
+                const largeArc = (value / 100) * 270 > 180 ? 1 : 0;
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}`);
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke', color);
+                path.setAttribute('stroke-width', strokeWidth);
+                path.setAttribute('stroke-linecap', 'round');
+                svg.appendChild(path);
+
+                // Center number
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', centerX);
+                text.setAttribute('y', centerY + 10);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('fill', color);
+                text.setAttribute('font-size', '36');
+                text.setAttribute('font-weight', 'bold');
+                text.setAttribute('font-family', 'Georgia, serif');
+                text.textContent = Math.round(value);
+                svg.appendChild(text);
+
+                if (progress < 1) requestAnimationFrame(animate);
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // DRAW TIMELINE
+        const timelineCanvas = document.getElementById('timelineCanvas');
+        const timelineCtx = timelineCanvas.getContext('2d');
+
+        function drawTimeline() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = timelineCanvas.getBoundingClientRect();
+            timelineCanvas.width = rect.width * dpr;
+            timelineCanvas.height = rect.height * dpr;
+            timelineCtx.scale(dpr, dpr);
+
+            const width = rect.width;
+            const height = rect.height;
+            const padding = 40;
+            const graphWidth = width - padding * 2;
+            const graphHeight = height - padding * 2;
+
+            timelineCtx.clearRect(0, 0, width, height);
+
+            // Grid
+            timelineCtx.strokeStyle = '#2a2a2a';
+            timelineCtx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding + (graphHeight / 4) * i;
+                timelineCtx.beginPath();
+                timelineCtx.moveTo(padding, y);
+                timelineCtx.lineTo(width - padding, y);
+                timelineCtx.stroke();
+            }
+
+            // Draw all metrics
+            const metrics = ['crime', 'marriage', 'alienation', 'strength', 'creative', 'mortality'];
+            metrics.forEach(metric => {
+                timelineCtx.strokeStyle = colors[metric];
+                timelineCtx.lineWidth = 2.5;
+                timelineCtx.globalAlpha = 0.9;
+                timelineCtx.beginPath();
+
+                for (let age = 1; age <= 80; age++) {
+                    const value = interpolate(data[metric], age);
+                    const x = padding + (age / 80) * graphWidth;
+                    const y = padding + graphHeight - (value / 100) * graphHeight;
+                    if (age === 1) timelineCtx.moveTo(x, y);
+                    else timelineCtx.lineTo(x, y);
+                }
+                timelineCtx.stroke();
+            });
+
+            // Current age cursor
+            const cursorX = padding + (currentAge / 80) * graphWidth;
+            timelineCtx.strokeStyle = '#c8d5b9';
+            timelineCtx.lineWidth = 3;
+            timelineCtx.globalAlpha = 1;
+            timelineCtx.beginPath();
+            timelineCtx.moveTo(cursorX, padding);
+            timelineCtx.lineTo(cursorX, height - padding);
+            timelineCtx.stroke();
+
+            // Age labels
+            timelineCtx.fillStyle = '#6a7a5c';
+            timelineCtx.font = '13px Georgia';
+            timelineCtx.textAlign = 'center';
+            [0, 20, 40, 60, 80].forEach(age => {
+                const x = padding + (age / 80) * graphWidth;
+                timelineCtx.fillText(age, x, height - padding + 25);
+            });
+        }
+
+        // Timeline click
+        timelineCanvas.addEventListener('click', (e) => {
+            const rect = timelineCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const padding = 40;
+            const graphWidth = rect.width - padding * 2;
+            const clickedAge = Math.round(((x - padding) / graphWidth) * 80);
+            if (clickedAge >= 1 && clickedAge <= 80) {
+                updateAge(clickedAge);
+            }
+        });
+
+
+        // UPDATE EVERYTHING
+        function updateAge(age) {
+            currentAge = age;
+            document.getElementById('ageDisplay').textContent = age;
+            document.getElementById('ageSlider').value = age;
+
+            // Calculate all values
+            const values = {
+                crime: interpolate(data.crime, age),
+                marriage: interpolate(data.marriage, age),
+                alienation: interpolate(data.alienation, age),
+                strength: interpolate(data.strength, age),
+                creative: interpolate(data.creative, age),
+                mortality: interpolate(data.mortality, age)
+            };
+
+            // Update dials
+            drawDial('dial1', values.crime, colors.crime);
+            drawDial('dial2', values.marriage, colors.marriage);
+            drawDial('dial3', values.alienation, colors.alienation);
+            drawDial('dial4', values.strength, colors.strength);
+            drawDial('dial5', values.creative, colors.creative);
+            drawDial('dial6', values.mortality, colors.mortality);
+
+            // Values are now shown inside the dials, no need to update separate elements
+
+            // Update radar chart
+            const radarCanvas = document.getElementById('radarChart');
+            if (radarCanvas) {
+                if (radarChart) {
+                    radarChart.data.datasets[0].data = [
+                        values.crime, values.marriage, values.alienation,
+                        values.strength, values.creative, values.mortality
+                    ];
+                    radarChart.data.datasets[0].label = `Age ${age}`;
+                    radarChart.update('none');
+                } else {
+                    const ctx = radarCanvas.getContext('2d');
+                    radarChart = new Chart(ctx, {
+                        type: 'radar',
+                        data: {
+                            labels: ['Crime', 'Marriage', 'Madness', 'Strength', 'Creativity', 'Death'],
+                            datasets: [{
+                                label: `Age ${age}`,
+                                data: [values.crime, values.marriage, values.alienation, values.strength, values.creative, values.mortality],
+                                borderColor: '#9db88b',
+                                backgroundColor: 'rgba(157, 184, 139, 0.2)',
+                                pointBackgroundColor: '#9db88b',
+                                pointBorderColor: '#c8d5b9',
+                                pointHoverBackgroundColor: '#c8d5b9',
+                                pointHoverBorderColor: '#9db88b'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            scales: {
+                                r: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    ticks: {
+                                        color: '#6a7a5c',
+                                        backdropColor: 'transparent',
+                                        font: { family: 'Georgia' }
+                                    },
+                                    grid: {
+                                        color: '#2a2a2a'
+                                    },
+                                    pointLabels: {
+                                        color: '#9db88b',
+                                        font: {
+                                            family: 'Georgia',
+                                            size: 12
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            animation: {
+                                duration: 0
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Highlight highest propensity
+            const highest = Object.keys(values).reduce((a, b) => values[a] > values[b] ? a : b);
+            document.querySelectorAll('.dial-card').forEach((card) => {
+                const metric = card.getAttribute('data-metric');
+                if (metric === highest) {
+                    card.classList.add('highest');
+                } else {
+                    card.classList.remove('highest');
+                }
+            });
+
+            // Redraw timeline
+            drawTimeline();
+        }
+
+        // SHOW MODAL
+        function showModal(metric) {
+            const modal = document.getElementById('modalOverlay');
+            const details = dialDetails[metric];
+
+            const titleElement = document.getElementById('modalTitle');
+            titleElement.textContent = details.title;
+            titleElement.style.color = colors[metric];
+
+            document.getElementById('modalDescription').textContent = details.description;
+
+            const insightElement = document.getElementById('modalInsight');
+            insightElement.textContent = details.insight;
+            insightElement.style.color = colors[metric];
+            insightElement.style.borderLeft = `3px solid ${colors[metric]}`;
+
+            const modalContent = document.querySelector('.modal-content');
+            modalContent.style.borderColor = colors[metric];
+
+            modal.classList.add('active');
+
+            // Draw chart
+            const ages = [];
+            const metricValues = [];
+            for (let age = 1; age <= 80; age++) {
+                ages.push(age);
+                metricValues.push(interpolate(data[metric], age));
+            }
+
+            if (modalChart) modalChart.destroy();
+
+            const canvas = document.getElementById('modalChart');
+            const ctx = canvas.getContext('2d');
+
+            modalChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ages,
+                    datasets: [{
+                        data: metricValues,
+                        borderColor: colors[metric],
+                        backgroundColor: `${colors[metric]}44`,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Age',
+                                color: colors[metric],
+                                font: { family: 'Georgia', size: 14 }
+                            },
+                            ticks: { color: '#6a7a5c', font: { family: 'Georgia' } },
+                            grid: { color: '#2a2a2a' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Index',
+                                color: colors[metric],
+                                font: { family: 'Georgia', size: 14 }
+                            },
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: '#6a7a5c', font: { family: 'Georgia' } },
+                            grid: { color: '#2a2a2a' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1a1a1a',
+                            titleColor: colors[metric],
+                            bodyColor: '#c8d5b9',
+                            borderColor: colors[metric],
+                            borderWidth: 1,
+                            titleFont: { family: 'Georgia' },
+                            bodyFont: { family: 'Georgia' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        // Click modal overlay to close
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'modalOverlay') closeModal();
+        });
+
+        // Add click handlers to dials
+        document.querySelectorAll('.dial-card').forEach((card) => {
+            card.addEventListener('click', () => {
+                const metric = card.getAttribute('data-metric');
+                if (metric) showModal(metric);
+            });
+        });
+
+        // Slider
+        document.getElementById('ageSlider').addEventListener('input', (e) => {
+            updateAge(parseInt(e.target.value));
+        });
+
+        // Keyboard
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            if (e.key === 'ArrowLeft' && currentAge > 1) {
+                e.preventDefault();
+                updateAge(currentAge - 1);
+            } else if (e.key === 'ArrowRight' && currentAge < 80) {
+                e.preventDefault();
+                updateAge(currentAge + 1);
+            }
+        });
+
+        // Initialize (moved to intro sequence)
+    </script>
+</body>
+</html>
